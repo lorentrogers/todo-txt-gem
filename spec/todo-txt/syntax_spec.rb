@@ -17,7 +17,8 @@ describe Todo::Syntax do
     end
 
     specify 'task with multiple contexts' do
-      expect(extract_contexts('something to do @work @play')).to eq(['@work', '@play'])
+      expect(extract_contexts('something to do @work @play')
+            ).to eq(['@work', '@play'])
     end
   end
 
@@ -35,7 +36,8 @@ describe Todo::Syntax do
     end
 
     specify 'task with multiple projects' do
-      expect(extract_projects('something to do +report +analysis')).to eq(['+report', '+analysis'])
+      expect(extract_projects('something to do +report +analysis')
+            ).to eq(['+report', '+analysis'])
     end
   end
 
@@ -67,11 +69,13 @@ describe Todo::Syntax do
     end
 
     specify 'task with created date' do
-      expect(orig_created_on('2016-03-29 something to do')).to eq(Date.new(2016, 03, 29))
+      expect(orig_created_on('2016-03-29 something to do')
+            ).to eq(Date.new(2016, 03, 29))
     end
 
     specify 'prioritised task with created date' do
-      expect(orig_created_on('(A) 2016-03-29 something to do')).to eq(Date.new(2016, 03, 29))
+      expect(orig_created_on('(A) 2016-03-29 something to do')
+            ).to eq(Date.new(2016, 03, 29))
     end
 
     specify 'date included in task text' do
@@ -107,7 +111,8 @@ describe Todo::Syntax do
     end
 
     specify 'task with due date' do
-      expect(get_due_on_date('something to do due:2016-03-30')).to eq(Date.new(2016, 03, 30))
+      expect(get_due_on_date('something to do due:2016-03-30')
+            ).to eq(Date.new(2016, 03, 30))
     end
   end
 
@@ -121,11 +126,14 @@ describe Todo::Syntax do
     end
 
     specify 'task with date, priority, projects and context' do
-      expect(get_item_text('(A) 2016-03-29 something to do +experiment @work')).to eq('something to do')
+      expect(get_item_text('(A) 2016-03-29 something to do +experiment @work')
+            ).to eq('something to do')
     end
 
     specify 'completed task with projects and context' do
-      expect(get_item_text('x 2016-03-30 2016-03-29 something to do +experiment @work')).to eq('something to do')
+      text = get_item_text(
+        'x 2016-03-30 2016-03-29 something to do +experiment @work')
+      expect(text).to eq('something to do')
     end
   end
 end

@@ -1,6 +1,7 @@
 require 'date'
 
 module Todo
+  # Holds a Todo.txt line item.
   class Task
     include Comparable
     include Todo::Logger
@@ -11,11 +12,12 @@ module Todo
     #
     # Example:
     #
-    #   task = Todo::Task.new("(A) A high priority task!")
-    def initialize task
+    #   task = Todo::Task.new('(A) A high priority task!')
+    def initialize(task)
       @orig = task
       @completed_on = get_completed_date(orig)
-      @priority, @created_on = orig_priority(orig), orig_created_on(orig)
+      @priority = orig_priority(orig)
+      @created_on = orig_created_on(orig)
       @due_on = get_due_on_date(orig)
       @contexts ||= extract_contexts(orig)
       @projects ||= extract_projects(orig)
@@ -25,15 +27,15 @@ module Todo
     #
     # Example:
     #
-    #   task = Todo::Task.new "(A) @context +project Hello!"
-    #   task.orig #=> "(A) @context +project Hello!"
+    #   task = Todo::Task.new '(A) @context +project Hello!'
+    #   task.orig #=> '(A) @context +project Hello!'
     attr_reader :orig
 
     # Returns the task's creation date, if any.
     #
     # Example:
     #
-    #   task = Todo::Task.new "(A) 2012-03-04 Task."
+    #   task = Todo::Task.new '(A) 2012-03-04 Task.'
     #   task.created_on
     #   #=> <Date: 2012-03-04 (4911981/2,0,2299161)>
     #
@@ -46,7 +48,7 @@ module Todo
     #
     # Example:
     #
-    #   task = Todo::Task.new "x 2012-03-04 Task."
+    #   task = Todo::Task.new 'x 2012-03-04 Task.'
     #   task.completed_on
     #   #=> <Date: 2012-03-04 (4911981/2,0,2299161)>
     #
@@ -59,7 +61,7 @@ module Todo
     #
     # Example:
     #
-    #   task = Todo::Task.new "(A) This is a task. due:2012-03-04"
+    #   task = Todo::Task.new '(A) This is a task. due:2012-03-04'
     #   task.due_on
     #   #=> <Date: 2012-03-04 (4911981/2,0,2299161)>
     #
@@ -72,10 +74,10 @@ module Todo
     #
     # Example:
     #
-    #   task = Todo::Task.new "(A) Some task."
-    #   task.priority #=> "A"
+    #   task = Todo::Task.new '(A) Some task.'
+    #   task.priority #=> 'A'
     #
-    #   task = Todo::Task.new "Some task."
+    #   task = Todo::Task.new 'Some task.'
     #   task.priority #=> nil
     attr_reader :priority
 
@@ -83,16 +85,16 @@ module Todo
     #
     # Example:
     #
-    #   task = Todo:Task.new "(A) @context Testing!"
-    #   task.context #=> ["@context"]
+    #   task = Todo:Task.new '(A) @context Testing!'
+    #   task.context #=> ['@context']
     attr_reader :contexts
 
     # Returns an array of all the +project annotations.
     #
     # Example:
     #
-    #   task = Todo:Task.new "(A) +test Testing!"
-    #   task.projects #=> ["+test"]
+    #   task = Todo:Task.new '(A) +test Testing!'
+    #   task.projects #=> ['+test']
     attr_reader :projects
 
     # Gets just the text content of the todo, without the priority, contexts
@@ -100,8 +102,8 @@ module Todo
     #
     # Example:
     #
-    #   task = Todo::Task.new "(A) @test Testing!"
-    #   task.text #=> "Testing!"
+    #   task = Todo::Task.new '(A) @test Testing!'
+    #   task.text #=> 'Testing!'
     def text
       @text ||= get_item_text(orig)
     end
@@ -110,7 +112,7 @@ module Todo
     #
     # Example:
     #
-    #   task = Todo::Task.new "(A) 2012-03-04 Task."
+    #   task = Todo::Task.new '(A) 2012-03-04 Task.'
     #   task.date
     #   #=> <Date: 2012-03-04 (4911981/2,0,2299161)>
     #
@@ -120,7 +122,7 @@ module Todo
     #
     # Deprecated
     def date
-      logger.warn("Task#date is deprecated, use created_on instead.")
+      logger.warn('Task#date is deprecated, use created_on instead.')
 
       @created_on
     end
@@ -129,7 +131,7 @@ module Todo
     #
     # Example:
     #
-    #   task = Todo::Task.new("This task is overdue! due:#{Date.today - 1}")
+    #   task = Todo::Task.new('This task is overdue! due:#{Date.today - 1}')
     #   task.overdue?
     #   #=> true
     def overdue?
@@ -140,11 +142,11 @@ module Todo
     #
     # Example:
     #
-    #   task = Todo::Task.new "x 2012-12-08 Task."
+    #   task = Todo::Task.new 'x 2012-12-08 Task.'
     #   task.done?
     #   #=> true
     #
-    #   task = Todo::Task.new "Task."
+    #   task = Todo::Task.new 'Task.'
     #   task.done?
     #   #=> false
     def done?
@@ -155,7 +157,7 @@ module Todo
     #
     # Example:
     #
-    #   task = Todo::Task.new "2012-12-08 Task."
+    #   task = Todo::Task.new '2012-12-08 Task.'
     #   task.done?
     #   #=> false
     #
@@ -175,7 +177,7 @@ module Todo
     #
     # Example:
     #
-    #   task = Todo::Task.new "x 2012-12-08 2012-03-04 Task."
+    #   task = Todo::Task.new 'x 2012-12-08 2012-03-04 Task.'
     #   task.done?
     #   #=> true
     #
@@ -195,7 +197,7 @@ module Todo
     #
     # Example:
     #
-    #   task = Todo::Task.new "x 2012-12-08 Task."
+    #   task = Todo::Task.new 'x 2012-12-08 Task.'
     #   task.done?
     #   #=> true
     #
@@ -214,25 +216,27 @@ module Todo
     #
     # Example:
     #
-    #   task = Todo::Task.new "(A) 2012-12-08 Task"
+    #   task = Todo::Task.new '(A) 2012-12-08 Task'
     #   task.to_s
-    #   #=> "(A) 2012-12-08 Task"
+    #   #=> '(A) 2012-12-08 Task'
     def to_s
-      priority_string = priority ? "(#{priority}) " : ""
-      done_string = done? ? "x #{completed_on} " : ""
-      created_on_string = created_on ? "#{created_on} " : ""
-      contexts_string = contexts.empty? ? "" : " #{contexts.join ' '}"
-      projects_string = projects.empty? ? "" : " #{projects.join ' '}"
-      due_on_string = due_on.nil? ? "" : " due:#{due_on}"
-      "#{done_string}#{priority_string}#{created_on_string}#{text}#{contexts_string}#{projects_string}#{due_on_string}"
+      priority_string = priority ? "(#{priority}) " : ''
+      done_string = done? ? "x #{completed_on} " : ''
+      created_on_string = created_on ? "#{created_on} " : ''
+      contexts_string = contexts.empty? ? '' : " #{contexts.join ' '}"
+      projects_string = projects.empty? ? '' : " #{projects.join ' '}"
+      due_on_string = due_on.nil? ? '' : " due:#{due_on}"
+
+      "#{done_string}#{priority_string}#{created_on_string}" \
+        "#{text}#{contexts_string}#{projects_string}#{due_on_string}"
     end
 
     # Compares the priorities of two tasks.
     #
     # Example:
     #
-    #   task1 = Todo::Task.new "(A) Priority A."
-    #   task2 = Todo::Task.new "(B) Priority B."
+    #   task1 = Todo::Task.new '(A) Priority A.'
+    #   task2 = Todo::Task.new '(B) Priority B.'
     #
     #   task1 > task2
     #   # => true
@@ -242,15 +246,15 @@ module Todo
     #
     #   task2 > task1
     #   # => false
-    def <=> other_task
-      if self.priority.nil? and other_task.priority.nil?
+    def <=>(other)
+      if priority.nil? && other.priority.nil?
         0
-      elsif other_task.priority.nil?
+      elsif other.priority.nil?
         1
-      elsif self.priority.nil?
+      elsif priority.nil?
         -1
       else
-        other_task.priority <=> self.priority
+        other.priority <=> priority
       end
     end
   end

@@ -1,12 +1,13 @@
 require 'logger'
 
 module Todo
+  # Handles depreciation warnings and other issues related to API usage
   module Logger
-    def self.included base
+    def self.included(base)
       base.extend(self)
     end
 
-    def self.logger= new_logger
+    def self.logger=(new_logger)
       @@logger = new_logger
     end
 

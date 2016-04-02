@@ -14,45 +14,45 @@ describe Todo::List do
     end
 
     # This is a little bit fragile but it helps me sleep at night.
-    expect(list[0].priority).to eq("A")
+    expect(list[0].priority).to eq('A')
   end
 
   it 'should be able to filter by priority' do
-    list.by_priority("A").each do |task|
-      expect(task.priority).to eq("A")
+    list.by_priority('A').each do |task|
+      expect(task.priority).to eq('A')
     end
 
     # Make sure some data was actually checked
-    expect(list.by_priority("A").length).to be > 0
+    expect(list.by_priority('A').length).to be > 0
   end
 
   it 'should be able to filter by context' do
-    list.by_context("@context").each do |task|
-      expect(task.contexts).to include "@context"
+    list.by_context('@context').each do |task|
+      expect(task.contexts).to include '@context'
     end
 
     # Make sure some data was actually checked
-    expect(list.by_context("@context").length).to be > 0
+    expect(list.by_context('@context').length).to be > 0
   end
 
   it 'should be able to filter by project' do
-    list.by_project("+project").each do |task|
-      expect(task.projects).to include "+project"
+    list.by_project('+project').each do |task|
+      expect(task.projects).to include '+project'
     end
 
     # Make sure some data was actually checked
-    expect(list.by_project("+project").length).to be > 0
+    expect(list.by_project('+project').length).to be > 0
   end
 
   it 'should be able to filter by project, context and priority' do
-    filtered = list.by_project("+project").
-                    by_context("@context").
-                    by_priority("C")
+    filtered = list.by_project('+project')
+                   .by_context('@context')
+                   .by_priority('C')
 
     filtered.each do |task|
-      expect(task.projects).to include "+project"
-      expect(task.contexts).to include "@context"
-      expect(task.priority).to eq("C")
+      expect(task.projects).to include '+project'
+      expect(task.contexts).to include '@context'
+      expect(task.priority).to eq('C')
     end
 
     # Make sure some data was actually checked
@@ -90,10 +90,8 @@ describe Todo::List do
 
   describe 'manual list creation' do
     it 'should be possible with a mix of tasks and strings' do
-      l = Todo::List.new([
-        "A task!",
-        Todo::Task.new("Another task!"),
-      ])
+      l = Todo::List.new(['A task!',
+                          Todo::Task.new('Another task!')])
 
       expect(l.length).to eq(2)
     end
