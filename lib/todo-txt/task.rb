@@ -168,7 +168,6 @@ module Todo
     #   #=> # the current date
     def do!
       @completed_on = Date.today
-      @priority = nil
     end
 
     # Marks the task as incomplete and resets its original priority.
@@ -188,7 +187,6 @@ module Todo
     #   #=> nil
     def undo!
       @completed_on = nil
-      @priority = orig_priority(orig)
     end
 
     # Toggles the task from complete to incomplete or vice versa.
@@ -218,13 +216,11 @@ module Todo
     #   task.to_s
     #   #=> "(A) 2012-12-08 Task"
     def to_s
-      priority_string = priority ? "(#{priority}) " : ""
-      done_string = done? ? "x #{completed_on} " : ""
-      created_on_string = created_on ? "#{created_on} " : ""
-      contexts_string = contexts.empty? ? "" : " #{contexts.join ' '}"
-      projects_string = projects.empty? ? "" : " #{projects.join ' '}"
-      due_on_string = due_on.nil? ? "" : " due:#{due_on}"
-      "#{done_string}#{priority_string}#{created_on_string}#{text}#{contexts_string}#{projects_string}#{due_on_string}"
+      if done?
+        compile_done_string
+      else
+        compile_string
+      end
     end
 
     # Compares the priorities of two tasks.
@@ -252,6 +248,71 @@ module Todo
       else
         other_task.priority <=> self.priority
       end
+    end
+
+    private
+
+    # Returns the priority of the Task, formatted depending on the
+    # completion state. If the task is incomplete, it will use the
+    # `(A)` format, if it is complete, it will use ` priority:A`.
+    def str_priority
+      if done?
+        priority ? " priority:#{priority}" : ''
+      else
+        priority ? "(#{priority}) " : ''
+      end
+    end
+
+    # Returns the completion status for the Task as an `x` with date
+    # if the task has been completed.
+    def str_done
+      done? ? "x #{completed_on} " : ''
+    end
+
+    # Returns the creation date for the Task, formatted as a string.
+    def str_created_on
+      created_on ? "#{created_on} " : ''
+    end
+
+    # Returns the contexts for the Task, formatted as a string.
+    # If none exists, it returns an empty string.
+    def str_contexts
+      contexts.empty? ? '' : " #{contexts.join ' '}"
+    end
+
+    # Returns the projects for the Task, formatted as a string.
+    # If none exists, it returns an empty string.
+    def str_projects
+      projects.empty? ? '' : " #{projects.join ' '}"
+    end
+
+    # Returns the due date for the Task, formatted as a string.
+    # If none exists, it returns an empty string.
+    def str_due_on
+      due_on.nil? ? '' : " due:#{due_on}"
+    end
+
+    # Returns the properly formatted string for Task#to_s.
+    # This method formats the string as though it has not yet been completed.
+    def compile_string
+      str_priority +
+        str_created_on +
+        text +
+        str_contexts +
+        str_projects +
+        str_due_on
+    end
+
+    # Returns the properly formatted string for Task#to_s.
+    # This method formats the string as though it has been completed.
+    def compile_done_string
+      str_done +
+        str_created_on +
+        text +
+        str_contexts +
+        str_projects +
+        str_due_on +
+        str_priority
     end
   end
 end

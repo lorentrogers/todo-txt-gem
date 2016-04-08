@@ -57,12 +57,13 @@ describe Todo::Task do
       expect(task.priority).to eq('B')
     end
 
-    it 'should remove the priority when calling Task#do!' do
+    it 'should keep the priority when calling Task#do!' do
       task = Todo::Task.new '(A) Task'
       task.do!
-      expect(task.priority).to be_nil
+      expect(task.priority).to eq('A')
     end
 
+    it 'resets the current priority when calling Task#undo!'
     it 'should reset to the original priority when calling Task#undo!' do
       task = Todo::Task.new '(A) Task'
       task.do!
@@ -124,12 +125,22 @@ describe Todo::Task do
       expect(task.created_on).to be_nil
     end
 
-    it 'should be toggable' do
-      task = Todo::Task.new '2012-12-08 This is not done!'
-      task.toggle!
-      expect(task.done?).to be true
-      task.toggle!
-      expect(task.done?).to be false
+    describe '#Toggle: ' do
+      it 'should be toggable' do
+        task = Todo::Task.new '2012-12-08 This is not done!'
+        task.toggle!
+        expect(task.done?).to be true
+        task.toggle!
+        expect(task.done?).to be false
+      end
+
+      it 'saves the priority in a key/value pair' do
+        Timecop.freeze(2013, 12, 8) do
+          task = Todo::Task.new '(A) Important task!'
+          task.toggle!
+          expect(task.to_s).to eq('x 2013-12-08 Important task! priority:A')
+        end
+      end
     end
   end
 
@@ -246,7 +257,7 @@ describe Todo::Task do
 
     it 'should convert to a string with due date' do
       task = Todo::Task.new 'x 2012-09-11 (B) 2012-03-04 This is a sweet task. @context due:2012-01-01 +project'
-      expect(task.to_s).to eq('x 2012-09-11 (B) 2012-03-04 This is a sweet task. @context +project due:2012-01-01')
+      expect(task.to_s).to eq('x 2012-09-11 2012-03-04 This is a sweet task. @context +project due:2012-01-01 priority:B')
     end
 
     it 'should have no due date with malformed date' do
